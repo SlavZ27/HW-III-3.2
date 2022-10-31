@@ -32,7 +32,7 @@ public class StudentController {
     }
 
     @GetMapping("/age/{age}")  //GET http://localhost:8080/student?age=20
-    public ResponseEntity<Collection<Student>> getStudentsWithEqualAge(@RequestParam Integer age) {
+    public ResponseEntity<Collection<Student>> getStudentsWithEqualAge(@PathVariable Integer age) {
         return ResponseEntity.ok(studentService.getStudentsWithEqualAge(age));
     }
 
@@ -53,7 +53,8 @@ public class StudentController {
 
     @DeleteMapping("{id}")      //DELETE http://localhost:8080/student/1
     public ResponseEntity<Student> deleteStudent(@PathVariable Long id) {
-        return ResponseEntity.ok(studentService.deleteStudent(id));
+        studentService.deleteStudent(id);
+        return ResponseEntity.ok().build();
     }
 
 }

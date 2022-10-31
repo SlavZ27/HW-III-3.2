@@ -32,7 +32,7 @@ public class FacultyController {
     }
 
     @GetMapping("/color/{color}")  //GET http://localhost:8080/faculty?color=20
-    public ResponseEntity<Collection<Faculty>> getStudentsWithEqualAge(@RequestParam String color) {
+    public ResponseEntity<Collection<Faculty>> getStudentsWithEqualAge(@PathVariable String color) {
         return ResponseEntity.ok(facultyService.getFacultiesWithEqualColor(color));
     }
 
@@ -53,6 +53,7 @@ public class FacultyController {
 
     @DeleteMapping("{id}")      //DELETE http://localhost:8080/faculty/1
     public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
-        return ResponseEntity.ok(facultyService.deleteFaculty(id));
+        facultyService.deleteFaculty(id);
+        return ResponseEntity.ok().build();
     }
 }

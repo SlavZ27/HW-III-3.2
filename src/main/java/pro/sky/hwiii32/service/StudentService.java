@@ -2,46 +2,42 @@ package pro.sky.hwiii32.service;
 
 import org.springframework.stereotype.Service;
 import pro.sky.hwiii32.model.Student;
+import pro.sky.hwiii32.repository.StudentRepository;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
-    private final Map<Long, Student> students = new HashMap<>();
-    private long lastId = 0;
 
-    public Student createStudent(Student Student) {
-        Student.setId(++lastId);
-        students.put(lastId, Student);
-        return Student;
+    private final StudentRepository studentRepository;
+
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
+
+    public Student createStudent(Student student) {
+        return studentRepository.save(student);
     }
 
     public Student findStudent(long id) {
-        return students.get(id);
+        return studentRepository.findById(id).orElse(null);
     }
 
-    public Student editStudent(Student Student) {
-        if (students.containsKey(Student.getId())) {
-            students.put(Student.getId(), Student);
-            return Student;
-        }
-        return null;
+    public Student editStudent(Student student) {
+        return studentRepository.save(student);
     }
 
-    public Student deleteStudent(long id) {
-        return students.remove(id);
+    public void deleteStudent(long id) {
+        studentRepository.deleteById(id);
     }
 
     public Collection<Student> getAll() {
-        return new ArrayList<>(students.values());
+        return studentRepository.findAll();
     }
 
     public Collection<Student> getStudentsWithEqualAge(int age) {
-        return students.values().stream()
+        return studentRepository.findAll().stream()
                 .filter(student -> student.getAge() == age)
                 .collect(Collectors.toList());
     }
