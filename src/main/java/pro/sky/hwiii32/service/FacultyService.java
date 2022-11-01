@@ -5,7 +5,6 @@ import pro.sky.hwiii32.model.Faculty;
 import pro.sky.hwiii32.repository.FacultyRepository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FacultyService {
@@ -37,8 +36,9 @@ public class FacultyService {
     }
 
     public Collection<Faculty> getFacultiesWithEqualColor(String needColor) {
-        return facultyRepository.findAll().stream()
-                .filter(faculty -> faculty.getColor().equals(needColor))
-                .collect(Collectors.toList());
+//        return facultyRepository.findAll().stream()
+//                .filter(faculty -> faculty.getColor().equals(needColor))
+//                .collect(Collectors.toList());
+        return facultyRepository.findFacultiesByColor(needColor);
     }
 }

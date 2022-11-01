@@ -31,7 +31,7 @@ public class FacultyController {
         return ResponseEntity.ok(faculty);
     }
 
-    @GetMapping("/color/{color}")  //GET http://localhost:8080/faculty?color=20
+    @GetMapping("/color/{color}")  //GET http://localhost:8080/faculty/color/blue
     public ResponseEntity<Collection<Faculty>> getStudentsWithEqualAge(@PathVariable String color) {
         return ResponseEntity.ok(facultyService.getFacultiesWithEqualColor(color));
     }

@@ -5,7 +5,6 @@ import pro.sky.hwiii32.model.Student;
 import pro.sky.hwiii32.repository.StudentRepository;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -37,9 +36,10 @@ public class StudentService {
     }
 
     public Collection<Student> getStudentsWithEqualAge(int age) {
-        return studentRepository.findAll().stream()
-                .filter(student -> student.getAge() == age)
-                .collect(Collectors.toList());
+//        return studentRepository.findAll().stream()
+//                .filter(student -> student.getAge() == age)
+//                .collect(Collectors.toList());
+        return studentRepository.findStudentsByAge(age);
     }
 
 }
