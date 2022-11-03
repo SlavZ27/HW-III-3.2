@@ -1,10 +1,13 @@
 package pro.sky.hwiii32.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pro.sky.hwiii32.model.Faculty;
+import pro.sky.hwiii32.record.FacultyRecord;
+import pro.sky.hwiii32.record.StudentRecord;
 import pro.sky.hwiii32.service.FacultyService;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -13,47 +16,52 @@ public class FacultyController {
 
     private final FacultyService facultyService;
 
+
     public FacultyController(FacultyService facultyService) {
         this.facultyService = facultyService;
     }
 
-    @GetMapping()  //GET http://localhost:8080/faculty/
-    public ResponseEntity<Collection<Faculty>> getAllFaculty() {
-        return ResponseEntity.ok(facultyService.getAll());
+    @PostMapping                //POST http://localhost:8080/faculty
+    public ResponseEntity<FacultyRecord> createFaculty(@RequestBody @Valid FacultyRecord facultyRecord) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(facultyService.createFaculty(facultyRecord));
     }
 
     @GetMapping("{id}")  //GET http://localhost:8080/faculty/1
-    public ResponseEntity<Faculty> getFaculty(@PathVariable Long id) {
-        Faculty faculty = facultyService.findFaculty(id);
-        if (faculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(faculty);
-    }
-
-    @GetMapping("/color/{color}")  //GET http://localhost:8080/faculty/color/blue
-    public ResponseEntity<Collection<Faculty>> getStudentsWithEqualAge(@PathVariable String color) {
-        return ResponseEntity.ok(facultyService.getFacultiesWithEqualColor(color));
-    }
-
-    @PostMapping                //POST http://localhost:8080/faculty
-    public ResponseEntity<Faculty> createFaculty(@RequestBody Faculty faculty) {
-        Faculty createdFaculty = facultyService.createFaculty(faculty);
-        return ResponseEntity.ok(createdFaculty);
+    public ResponseEntity<FacultyRecord> readFaculty(@PathVariable Long id) {
+        return ResponseEntity.ok(facultyService.readFaculty(id));
     }
 
     @PutMapping()               //PUT http://localhost:8080/faculty/
-    public ResponseEntity<Faculty> editFaculty(@RequestBody Faculty faculty) {
-        Faculty foundFaculty = facultyService.editFaculty(faculty);
-        if (foundFaculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(foundFaculty);
+    public ResponseEntity<FacultyRecord> updateFaculty(@RequestBody @Valid FacultyRecord facultyRecord) {
+        return ResponseEntity.ok(facultyService.updateFaculty(facultyRecord));
     }
 
-    @DeleteMapping("{id}")      //DELETE http://localhost:8080/faculty/1
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
-        facultyService.deleteFaculty(id);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("{id}")    //DELETE http://localhost:8080/faculty/1
+    public ResponseEntity<FacultyRecord> deleteFaculty(@PathVariable Long id) {
+        return ResponseEntity.ok(facultyService.deleteFaculty(id));
     }
+
+    @GetMapping()  //GET http://localhost:8080/faculty/
+    public ResponseEntity<Collection<FacultyRecord>> getAllFaculty() {
+        return ResponseEntity.ok(facultyService.getAll());
+    }
+
+    @GetMapping(params = "color")  //GET http://localhost:8080/faculty?color=blue
+    public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualColor(@RequestParam String color) {
+        return ResponseEntity.ok(facultyService.getFacultiesWithEqualColor(color));
+    }
+
+    @GetMapping(params = {"name", "color"})  //GET http://localhost:8080/faculty?name=nam1&color=blue
+    public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualNameOrColor(
+            @RequestParam(required = false) String name
+            , @RequestParam(required = false) String color) {
+        return ResponseEntity.ok(facultyService.getFacultiesWithEqualNameOrColor(name, color));
+    }
+
+    @GetMapping(params = "faculty_id")  //GET http://localhost:8080/faculty?faculty_id=15
+    public ResponseEntity<Collection<StudentRecord>> getStudentsWithEqualFaculty(@RequestParam("faculty_id") Long facultyId) {
+        return ResponseEntity.ok(facultyService.getStudentsWithEqualFaculty(facultyId));
+    }
+
+
 }
