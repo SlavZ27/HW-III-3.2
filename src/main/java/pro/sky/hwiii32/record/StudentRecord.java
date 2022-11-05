@@ -1,6 +1,9 @@
 package pro.sky.hwiii32.record;
 
+import pro.sky.hwiii32.model.Faculty;
+
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class StudentRecord {
 
@@ -9,6 +12,16 @@ public class StudentRecord {
     private String name;
     @NotBlank
     private int age;
+    @NotNull
+    private Faculty faculty;
+
+    public Faculty getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
+    }
 
     public long getId() {
         return id;

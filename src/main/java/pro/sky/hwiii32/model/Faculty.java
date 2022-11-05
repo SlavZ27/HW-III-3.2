@@ -1,6 +1,8 @@
 package pro.sky.hwiii32.model;
 
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -61,7 +63,7 @@ public class Faculty {
     }
 
     public Set<Student> getStudents() {
-        return students;
+        return new HashSet<>(students);
     }
 
     public void setStudents(Set<Student> students) {

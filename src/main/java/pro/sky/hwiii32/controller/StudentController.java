@@ -48,19 +48,20 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAll());
     }
 
-    @GetMapping(params = "age")  //GET http://localhost:8080/student?age=3
+    @GetMapping(value = "filter", params = "age")  //GET http://localhost:8080/student/filter?age=3
     public ResponseEntity<Collection<StudentRecord>> getStudentsWithEqualAge(@RequestParam Integer age) {
         return ResponseEntity.ok(studentService.getStudentsWithEqualAge(age));
     }
 
-    @GetMapping(params = {"age_from", "age_to"})  //GET http://localhost:8080/student?age_from=3&age_to=5
+    @GetMapping(value = "filter", params = {"age_from", "age_to"})
+    //GET http://localhost:8080/student/filter?age_from=3&age_to=5
     public ResponseEntity<Collection<StudentRecord>> getStudentsWithBetweenAge(
             @RequestParam("age_from") Integer ageFrom
             , @RequestParam("age_to") Integer ageTo) {
         return ResponseEntity.ok(studentService.getStudentsWithBetweenAge(ageFrom, ageTo));
     }
 
-    @GetMapping(params = "student_id")  //GET http://localhost:8080/student?student_id=3
+    @GetMapping(value = "filter", params = "student_id")  //GET http://localhost:8080/student/filter?student_id=3
     public ResponseEntity<FacultyRecord> getFacultyByStudent(@RequestParam("student_id") Long studentId) {
         return ResponseEntity.ok(studentService.getFacultyByStudent(studentId));
     }

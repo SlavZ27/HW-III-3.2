@@ -46,19 +46,20 @@ public class FacultyController {
         return ResponseEntity.ok(facultyService.getAll());
     }
 
-    @GetMapping(params = "color")  //GET http://localhost:8080/faculty?color=blue
+    @GetMapping(value = "filter", params = "color")  //GET http://localhost:8080/faculty/filter?color=blue
     public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualColor(@RequestParam String color) {
         return ResponseEntity.ok(facultyService.getFacultiesWithEqualColor(color));
     }
 
-    @GetMapping(params = {"name", "color"})  //GET http://localhost:8080/faculty?name=nam1&color=blue
+    @GetMapping(value = "filter", params = {"name", "color"})
+    //GET http://localhost:8080/faculty/filter?name=nam1&color=blue
     public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualNameOrColor(
             @RequestParam(required = false) String name
             , @RequestParam(required = false) String color) {
         return ResponseEntity.ok(facultyService.getFacultiesWithEqualNameOrColor(name, color));
     }
 
-    @GetMapping(params = "faculty_id")  //GET http://localhost:8080/faculty?faculty_id=15
+    @GetMapping(value = "filter", params = "faculty_id")  //GET http://localhost:8080/faculty/filter?faculty_id=15
     public ResponseEntity<Collection<StudentRecord>> getStudentsWithEqualFaculty(@RequestParam("faculty_id") Long facultyId) {
         return ResponseEntity.ok(facultyService.getStudentsWithEqualFaculty(facultyId));
     }

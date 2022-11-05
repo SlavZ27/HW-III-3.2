@@ -8,15 +8,13 @@ import pro.sky.hwiii32.record.StudentRecord;
 
 @Component
 public class RecordMapper {
-//    private long id;
-//    private String name;
-//    private int age;
 
     public StudentRecord toRecord(Student student) {
         StudentRecord studentRecord = new StudentRecord();
         studentRecord.setId(student.getId());
         studentRecord.setName(student.getName());
         studentRecord.setAge(student.getAge());
+//        studentRecord.setFaculty(student.getFaculty());
         return studentRecord;
     }
 
@@ -25,6 +23,7 @@ public class RecordMapper {
         facultyRecord.setId(faculty.getId());
         facultyRecord.setName(faculty.getName());
         facultyRecord.setColor(faculty.getColor());
+//        facultyRecord.setStudents(faculty.getStudents());
         return facultyRecord;
     }
 
@@ -33,6 +32,7 @@ public class RecordMapper {
         student.setId(studentRecord.getId());
         student.setName(studentRecord.getName());
         student.setAge(studentRecord.getAge());
+//        student.setFaculty(student.getFaculty());
         return student;
     }
 
@@ -41,6 +41,7 @@ public class RecordMapper {
         faculty.setId(facultyRecord.getId());
         faculty.setName(facultyRecord.getName());
         faculty.setColor(facultyRecord.getColor());
+//        faculty.setStudents(facultyRecord.getStudents());
         return faculty;
     }
 
