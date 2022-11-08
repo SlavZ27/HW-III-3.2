@@ -1,5 +1,6 @@
 package pro.sky.hwiii32.service;
 
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +38,10 @@ public class AvatarService {
     public void uploadAvatar(Long studentId, MultipartFile fileAvatar) throws IOException {
         Student student = studentService.findStudentById(studentId);
 
-        String fileNameStr = fileAvatar.getName();
+        String fileNameStr = fileAvatar.getOriginalFilename();
+        if (fileNameStr == null) {
+            throw new InvalidFileNameException(fileAvatar.getName(), "Некорректное имя файла");
+        }
         String fileNameExtStr = fileNameStr.substring(fileNameStr.lastIndexOf('.') + 1);
 
         Path filePath = Path.of(avatarsDir, student + "." + fileNameExtStr);
