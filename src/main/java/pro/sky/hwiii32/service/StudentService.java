@@ -17,6 +17,7 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final RecordMapper recordMapper;
 
+
     public StudentService(StudentRepository studentRepository, RecordMapper recordMapper) {
         this.studentRepository = studentRepository;
         this.recordMapper = recordMapper;

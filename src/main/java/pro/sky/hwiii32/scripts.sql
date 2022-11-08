@@ -1,4 +1,4 @@
-select * from student where age>10 and age<20;
+select * from student where student.age>10 and student.age<20;
 select student.name from student;
 select * from student where name like '%o%';
 select * from student where id>age;
