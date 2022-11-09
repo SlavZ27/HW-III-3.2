@@ -45,7 +45,7 @@ public class AvatarController {
         avatarService.readAvatarFromDir(id, response);
     }
 
-    //DELETE http://localhost:8080/student/1avatar
+    //DELETE http://localhost:8080/student/1/avatar
     @DeleteMapping("{id}/avatar")
     public ResponseEntity<String> deleteAvatar(@PathVariable Long id) throws IOException {
         return ResponseEntity.ok(avatarService.deleteAvatar(id));

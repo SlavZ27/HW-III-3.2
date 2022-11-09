@@ -52,7 +52,7 @@ public class FacultyController {
     }
 
     @GetMapping(value = "filter", params = {"name", "color"})
-    //GET http://localhost:8080/faculty/filter?name=nam1&color=blue
+    //GET http://localhost:8080/faculty/filter?name=name&color=blue
     public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualNameOrColor(
             @RequestParam(required = false) String name
             , @RequestParam(required = false) String color) {

@@ -1,11 +1,6 @@
 package pro.sky.hwiii32.record;
 
-import pro.sky.hwiii32.model.Student;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Set;
 
 public class FacultyRecord {
 
@@ -14,16 +9,6 @@ public class FacultyRecord {
     private String name;
     @NotBlank
     private String color;
-    @NotNull
-    private Set<Student> students;
-
-    public Set<Student> getStudents() {
-        return new HashSet<>(students);
-    }
-
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
 
     public long getId() {
         return id;

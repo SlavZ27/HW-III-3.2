@@ -64,7 +64,7 @@ class FacultyServiceTest {
         studentRecord.setFaculty(faculty);
 
         faculty.setStudents(new HashSet<>(Set.of(student)));
-        facultyRecord.setStudents(new HashSet<>(Set.of(student)));
+//        facultyRecord.setStudents(new HashSet<>(Set.of(student)));
     }
 
 
