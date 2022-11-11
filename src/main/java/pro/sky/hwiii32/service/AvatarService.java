@@ -2,17 +2,24 @@ package pro.sky.hwiii32.service;
 
 import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import pro.sky.hwiii32.component.RecordMapper;
 import pro.sky.hwiii32.exceptions.AvatarNotFoundException;
+import pro.sky.hwiii32.exceptions.StudentNotFoundException;
 import pro.sky.hwiii32.model.Avatar;
 import pro.sky.hwiii32.model.Student;
+import pro.sky.hwiii32.record.AvatarRecord;
 import pro.sky.hwiii32.repository.AvatarRepository;
+import pro.sky.hwiii32.repository.StudentRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -21,22 +28,30 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 public class AvatarService {
 
     private final AvatarRepository avatarRepository;
-    private final StudentService studentService;
+    private final StudentRepository studentRepository;
+    private final RecordMapper recordMapper;
     @Value("${path.to.avatars.folder}")
     private String avatarsDir;
 
-    public AvatarService(AvatarRepository avatarRepository, StudentService studentService) {
+
+    public AvatarService(AvatarRepository avatarRepository, StudentRepository studentRepository, RecordMapper recordMapper) {
         this.avatarRepository = avatarRepository;
-        this.studentService = studentService;
+        this.studentRepository = studentRepository;
+        this.recordMapper = recordMapper;
     }
 
-    public Avatar findAvatarByStudentIdByIdOrNew(Long id) {
-        return avatarRepository.findAvatarByStudent(studentService.findStudentById(id))
+    public Avatar findAvatarByStudentIdByIdOrNew(Long studentId) {
+        return avatarRepository
+                .findAvatarByStudent(
+                        studentRepository.findById(studentId).
+                                orElseThrow(() -> new StudentNotFoundException(String.valueOf(studentId))))
                 .orElse(new Avatar());
     }
 
-    public void uploadAvatar(Long studentId, MultipartFile fileAvatar) throws IOException {
-        Student student = studentService.findStudentById(studentId);
+    public Avatar uploadAvatar(Long studentId, MultipartFile fileAvatar) throws IOException {
+        Student student = studentRepository
+                .findById(studentId)
+                .orElseThrow(() -> new StudentNotFoundException(String.valueOf(studentId)));
 
         String fileNameStr = fileAvatar.getOriginalFilename();
         if (fileNameStr == null) {
@@ -63,17 +78,16 @@ public class AvatarService {
         avatar.setMediaType(fileAvatar.getContentType());
         avatar.setData(fileAvatar.getBytes());
         avatar.setStudent(student);
-        avatarRepository.save(avatar);
+        return avatarRepository.save(avatar);
     }
 
 
-    public String createAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
-        uploadAvatar(studentId, avatarFile);
-        return "Download done";
+    public AvatarRecord createAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
+        return recordMapper.toRecord(uploadAvatar(studentId, avatarFile));
     }
 
-    public void readAvatarFromDir(Long id, HttpServletResponse response) throws IOException {
-        Avatar avatar = readAvatarDb(id);
+    public void readAvatarFromDir(Long studentId, HttpServletResponse response) throws IOException {
+        Avatar avatar = readAvatarDb(studentId);
         Path path = Path.of(avatar.getFilePath());
         try (
                 InputStream is = Files.newInputStream(path);
@@ -86,19 +100,32 @@ public class AvatarService {
         }
     }
 
-    public Avatar readAvatarDb(long id) {
+    public Avatar readAvatarDb(long studentId) {
         return avatarRepository
-                .findAvatarByStudent(studentService.findStudentById(id))
-                .orElseThrow(() -> new AvatarNotFoundException("Такого аватара нет"));
+                .findAvatarByStudent(
+                        studentRepository.findById(studentId).
+                                orElseThrow(() -> new StudentNotFoundException(String.valueOf(studentId))))
+                .orElseThrow(() -> new AvatarNotFoundException(
+                        studentRepository.findById(studentId).get().getId().toString()));
     }
 
-    public String deleteAvatar(long id) throws IOException {
+    public String deleteAvatar(long studentId) throws IOException {
         Avatar deleteAvatar = avatarRepository
-                .findAvatarByStudent(studentService.findStudentById(id))
-                .orElseThrow(() -> new AvatarNotFoundException("Такого аватара нет"));
+                .findAvatarByStudent(
+                        studentRepository.findById(studentId).
+                                orElseThrow(() -> new StudentNotFoundException(String.valueOf(studentId))))
+                .orElseThrow(() -> new AvatarNotFoundException(
+                        studentRepository.findById(studentId).orElse(null).getId().toString()));
 
         Files.deleteIfExists(Path.of(deleteAvatar.getFilePath()));
         avatarRepository.deleteById(deleteAvatar.getId());
-        return "Аватар студента " + id + " удалён";
+        return "Аватар студента " + studentId + " удалён";
+    }
+
+    public List<AvatarRecord> getAllAvatarWithPagination(Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber-1,pageSize);
+        return avatarRepository.findAll(pageRequest).getContent().stream()
+                .map(recordMapper::toRecord)
+                .collect(Collectors.toList());
     }
 }

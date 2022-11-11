@@ -56,7 +56,7 @@ class StudentServiceTest {
         studentRecord.setId(2L);
         studentRecord.setName("11111");
         studentRecord.setAge(5);
-        studentRecord.setFaculty(faculty);
+        studentRecord.setFacultyId(faculty.getId());
 
 //        faculty.setStudents(new HashSet<>(Set.of(student)));
 //        facultyRecord.setStudents(new HashSet<>(Set.of(student)));

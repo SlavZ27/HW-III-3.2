@@ -1,7 +1,7 @@
 package pro.sky.hwiii32.record;
 
-import pro.sky.hwiii32.model.Faculty;
-
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
 public class StudentRecord {
@@ -9,15 +9,17 @@ public class StudentRecord {
     private long id;
     @NotBlank
     private String name;
+    @Min(value = 16, message = "Возраст студента должен быть больше 16")
+    @Max(value = 27, message = "Возраст студента должен быть меньше 27")
     private int age;
-    private Faculty faculty;
+    private Long facultyId;
 
-    public Faculty getFaculty() {
-        return faculty;
+    public Long getFacultyId() {
+        return facultyId;
     }
 
-    public void setFaculty(Faculty faculty) {
-        this.faculty = faculty;
+    public void setFacultyId(Long facultyId) {
+        this.facultyId = facultyId;
     }
 
     public long getId() {

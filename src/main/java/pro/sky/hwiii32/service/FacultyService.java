@@ -15,13 +15,11 @@ import java.util.stream.Collectors;
 public class FacultyService {
 
     private final FacultyRepository facultyRepository;
-    private final StudentService studentService;
     private final RecordMapper recordMapper;
 
 
-    public FacultyService(FacultyRepository facultyRepository, StudentService studentService, RecordMapper recordMapper) {
+    public FacultyService(FacultyRepository facultyRepository, RecordMapper recordMapper) {
         this.facultyRepository = facultyRepository;
-        this.studentService = studentService;
         this.recordMapper = recordMapper;
     }
 
@@ -66,14 +64,16 @@ public class FacultyService {
                 .collect(Collectors.toList());
     }
 
-    public Collection<FacultyRecord> getFacultiesWithEqualNameOrColor(String name, String color) {
-        return facultyRepository.findFacultiesByNameIgnoreCaseOrColorIgnoreCase(name, color).stream()
+    public Collection<FacultyRecord> getFacultiesWithEqualNameOrColor(String nameOrColor) {
+        return facultyRepository.findFacultiesByNameIgnoreCaseOrColorIgnoreCase(nameOrColor, nameOrColor).stream()
                 .map(recordMapper::toRecord)
                 .collect(Collectors.toList());
     }
 
     public Collection<StudentRecord> getStudentsWithEqualFaculty(Long facultyId) {
-        return studentService.findStudentsByFaculty(facultyId).stream()
+        return facultyRepository.findById(facultyId)
+                .orElseThrow(() -> new FacultyNotFoundException(String.valueOf(facultyId)))
+                .getStudents().stream()
                 .map(recordMapper::toRecord)
                 .collect(Collectors.toList());
     }

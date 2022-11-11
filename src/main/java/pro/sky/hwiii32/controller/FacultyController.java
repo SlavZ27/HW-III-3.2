@@ -46,21 +46,20 @@ public class FacultyController {
         return ResponseEntity.ok(facultyService.getAll());
     }
 
-    @GetMapping(value = "filter", params = "color")  //GET http://localhost:8080/faculty/filter?color=blue
-    public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualColor(@RequestParam String color) {
+    @GetMapping(params = "color")  //GET http://localhost:8080/faculty?color=blue
+    public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualColor(@RequestParam(required = false) String color) {
         return ResponseEntity.ok(facultyService.getFacultiesWithEqualColor(color));
     }
 
-    @GetMapping(value = "filter", params = {"name", "color"})
-    //GET http://localhost:8080/faculty/filter?name=name&color=blue
+    @GetMapping(params = "name-or-color")
+    //GET http://localhost:8080/faculty?name-or-color=blue
     public ResponseEntity<Collection<FacultyRecord>> getFacultiesWithEqualNameOrColor(
-            @RequestParam(required = false) String name
-            , @RequestParam(required = false) String color) {
-        return ResponseEntity.ok(facultyService.getFacultiesWithEqualNameOrColor(name, color));
+            @RequestParam(value = "name-or-color", required = false) String nameOrColor) {
+        return ResponseEntity.ok(facultyService.getFacultiesWithEqualNameOrColor(nameOrColor));
     }
 
-    @GetMapping(value = "filter", params = "faculty_id")  //GET http://localhost:8080/faculty/filter?faculty_id=15
-    public ResponseEntity<Collection<StudentRecord>> getStudentsWithEqualFaculty(@RequestParam("faculty_id") Long facultyId) {
+    @GetMapping(path = {"{id}/student"})  //GET http://localhost:8080/faculty/1/student
+    public ResponseEntity<Collection<StudentRecord>> getStudentsWithEqualFaculty(@PathVariable(value = "id", required = false) Long facultyId) {
         return ResponseEntity.ok(facultyService.getStudentsWithEqualFaculty(facultyId));
     }
 

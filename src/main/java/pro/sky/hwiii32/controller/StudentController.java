@@ -9,6 +9,7 @@ import pro.sky.hwiii32.service.StudentService;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("student")
@@ -48,22 +49,37 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAll());
     }
 
-    @GetMapping(value = "filter", params = "age")  //GET http://localhost:8080/student/filter?age=3
-    public ResponseEntity<Collection<StudentRecord>> getStudentsWithEqualAge(@RequestParam Integer age) {
+    @GetMapping(params = "age")  //GET http://localhost:8080/student?age=3
+    public ResponseEntity<Collection<StudentRecord>> getStudentsWithEqualAge(@RequestParam(required = false) Integer age) {
         return ResponseEntity.ok(studentService.getStudentsWithEqualAge(age));
     }
 
-    @GetMapping(value = "filter", params = {"age_from", "age_to"})
-    //GET http://localhost:8080/student/filter?age_from=3&age_to=5
+    @GetMapping(params = {"age_from", "age_to"})
+    //GET http://localhost:8080/studentage_from=3&age_to=5
     public ResponseEntity<Collection<StudentRecord>> getStudentsWithBetweenAge(
-            @RequestParam("age_from") Integer ageFrom
-            , @RequestParam("age_to") Integer ageTo) {
+            @RequestParam(value = "age_from",required = false) Integer ageFrom
+            , @RequestParam(value = "age_to",required = false) Integer ageTo) {
         return ResponseEntity.ok(studentService.getStudentsWithBetweenAge(ageFrom, ageTo));
     }
 
-    @GetMapping(value = "filter", params = "student_id")  //GET http://localhost:8080/student/filter?student_id=3
-    public ResponseEntity<FacultyRecord> getFacultyByStudent(@RequestParam("student_id") Long studentId) {
+    @GetMapping(path = {"{id}/faculty"})  //GET http://localhost:8080/student/1/faculty
+    public ResponseEntity<FacultyRecord> getFacultyByStudent(@PathVariable(value = "id") Long studentId) {
         return ResponseEntity.ok(studentService.getFacultyByStudent(studentId));
+    }
+
+    @GetMapping("count")  //GET http://localhost:8080/student/count
+    public ResponseEntity<Long> getCountStudent() {
+        return ResponseEntity.ok(studentService.getCountStudent());
+    }
+
+    @GetMapping("mid-age")  //GET http://localhost:8080/student/mid-age
+    public ResponseEntity<Float> getMidAgeOfStudent() {
+        return ResponseEntity.ok(studentService.getMidAgeOfStudent());
+    }
+
+    @GetMapping("5BiggerId")  //GET http://localhost:8080/student/5BiggerId
+    public ResponseEntity<List<StudentRecord>> get5StudentWithBiggerId() {
+        return ResponseEntity.ok(studentService.get5StudentWithBiggerId());
     }
 
 }

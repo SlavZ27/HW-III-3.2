@@ -23,9 +23,7 @@ import pro.sky.hwiii32.service.AvatarService;
 import pro.sky.hwiii32.service.FacultyService;
 import pro.sky.hwiii32.service.StudentService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -337,7 +335,7 @@ class ApplicationWebMvcTest {
         when(studentRepository.findStudentsByAge(anyInt())).thenReturn(studentList);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/student/filter?age=30")
+                        .get("/student?age=30")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -386,7 +384,7 @@ class ApplicationWebMvcTest {
         when(studentRepository.findStudentsByAgeBetween(anyInt(), anyInt())).thenReturn(studentList);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/student/filter?age_from=3&age_to=5")
+                        .get("/student?age_from=3&age_to=5")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -422,7 +420,7 @@ class ApplicationWebMvcTest {
         when(studentRepository.findById(anyLong())).thenReturn(Optional.of(student1));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/student/filter?student_id=1")
+                        .get("/student/1/faculty")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -437,7 +435,7 @@ class ApplicationWebMvcTest {
         when(studentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/student/filter?student_id=1")
+                        .get("/student/1/faculty")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isNotFound());
@@ -714,7 +712,7 @@ class ApplicationWebMvcTest {
         when(facultyRepository.findFacultiesByColor(anyString())).thenReturn(facultyList);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/faculty/filter?color=blue")
+                        .get("/faculty?color=blue")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -765,7 +763,7 @@ class ApplicationWebMvcTest {
                 .thenReturn(facultyList);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/faculty/filter?name=name&color=blue")
+                        .get("/faculty?name-or-color=blue")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -820,16 +818,18 @@ class ApplicationWebMvcTest {
         student3.setFaculty(faculty1);
 
 
-        List<Student> studentList = new ArrayList<>();
+        Set<Student> studentList = new HashSet<>();
         studentList.add(student1);
         studentList.add(student2);
         studentList.add(student3);
 
-        when(studentRepository.findStudentsByFacultyId(anyLong()))
-                .thenReturn(studentList);
+        faculty1.setStudents(studentList);
+
+        when(facultyRepository.findById(anyLong()))
+                .thenReturn(Optional.of(faculty1));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/faculty/filter?faculty_id=15")
+                        .get("/faculty/15/student")
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())

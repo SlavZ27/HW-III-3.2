@@ -2,6 +2,7 @@ package pro.sky.hwiii32.service;
 
 import org.springframework.stereotype.Service;
 import pro.sky.hwiii32.component.RecordMapper;
+import pro.sky.hwiii32.exceptions.FacultyNotFoundException;
 import pro.sky.hwiii32.exceptions.StudentNotFoundException;
 import pro.sky.hwiii32.model.Student;
 import pro.sky.hwiii32.record.FacultyRecord;
@@ -9,6 +10,8 @@ import pro.sky.hwiii32.record.StudentRecord;
 import pro.sky.hwiii32.repository.StudentRepository;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,11 +73,25 @@ public class StudentService {
     }
 
     public FacultyRecord getFacultyByStudent(Long studentId) {
-        return recordMapper.toRecord(
-                findStudentById(studentId).getFaculty());
+        return recordMapper.toRecord(Optional.ofNullable(
+                findStudentById(studentId).getFaculty()).orElseThrow(() -> new FacultyNotFoundException("")));
     }
 
     public Collection<Student> findStudentsByFaculty(Long facultyId) {
         return studentRepository.findStudentsByFacultyId(facultyId);
+    }
+
+    public Long getCountStudent() {
+        return studentRepository.getCountStudent();
+    }
+
+    public Float getMidAgeOfStudent() {
+        return studentRepository.getMidAgeOfStudent();
+    }
+
+    public List<StudentRecord> get5StudentWithBiggerId() {
+        return studentRepository.get5StudentWithBiggerId().stream()
+                .map(recordMapper::toRecord)
+                .collect(Collectors.toList());
     }
 }

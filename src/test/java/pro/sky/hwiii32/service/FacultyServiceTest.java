@@ -27,8 +27,6 @@ class FacultyServiceTest {
     @Mock
     private FacultyRepository facultyRepository;
     @Mock
-    private StudentService studentService;
-    @Mock
     private RecordMapper recordMapper;
 
     private FacultyService facultyService;
@@ -39,7 +37,7 @@ class FacultyServiceTest {
 
     @BeforeEach
     void set() {
-        facultyService = new FacultyService(facultyRepository, studentService, recordMapper);
+        facultyService = new FacultyService(facultyRepository, recordMapper);
 
         faculty = new Faculty();
         faculty.setId(1L);
@@ -61,7 +59,7 @@ class FacultyServiceTest {
         studentRecord.setId(2L);
         studentRecord.setName("11111");
         studentRecord.setAge(5);
-        studentRecord.setFaculty(faculty);
+        studentRecord.setFacultyId(faculty.getId());
 
         faculty.setStudents(new HashSet<>(Set.of(student)));
 //        facultyRecord.setStudents(new HashSet<>(Set.of(student)));
@@ -139,17 +137,18 @@ class FacultyServiceTest {
     @Test
     void getFacultiesWithEqualNameOrColorTest() {
         when(recordMapper.toRecord(faculty)).thenReturn(facultyRecord);
-        when(facultyRepository.findFacultiesByNameIgnoreCaseOrColorIgnoreCase("str", "blue"))
+        when(facultyRepository.findFacultiesByNameIgnoreCaseOrColorIgnoreCase(anyString(),anyString()))
                 .thenReturn(new ArrayList<>(List.of(faculty)));
         assertIterableEquals(facultyService
-                .getFacultiesWithEqualNameOrColor("str", "blue"), new ArrayList<>(List.of(facultyRecord)));
+                .getFacultiesWithEqualNameOrColor("blue"), new ArrayList<>(List.of(facultyRecord)));
     }
 
     @Test
     void getStudentsWithEqualFacultyTest() {
         when(recordMapper.toRecord(student)).thenReturn(studentRecord);
-        when(studentService.findStudentsByFaculty(1L))
-                .thenReturn(new ArrayList<>(List.of(student)));
+
+        when(facultyRepository.findById(anyLong()))
+                .thenReturn(Optional.of(faculty));
         assertIterableEquals(facultyService
                 .getStudentsWithEqualFaculty(1L), new ArrayList<>(List.of(studentRecord)));
     }
