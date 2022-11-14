@@ -65,7 +65,10 @@
             <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
