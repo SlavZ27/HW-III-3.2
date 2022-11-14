@@ -32,9 +32,15 @@ public class StudentService {
     }
 
     public StudentRecord createStudent(StudentRecord studentRecord) {
+        Student studentEntity = recordMapper.toEntity(studentRecord);
+        Student studentCreate = new Student();
+        studentCreate.setName(studentEntity.getName());
+        studentCreate.setAge(studentEntity.getAge());
+        if (studentEntity.getFaculty() != null) {
+            studentCreate.setFaculty(studentEntity.getFaculty());
+        }
         return recordMapper.toRecord(
-                studentRepository.save(
-                        recordMapper.toEntity(studentRecord)));
+                studentRepository.save(studentCreate));
     }
 
     public StudentRecord readStudent(long id) {

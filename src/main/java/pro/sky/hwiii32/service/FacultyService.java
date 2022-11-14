@@ -29,9 +29,15 @@ public class FacultyService {
     }
 
     public FacultyRecord createFaculty(FacultyRecord facultyRecord) {
+        Faculty facultyEntity = recordMapper.toEntity(facultyRecord);
+        Faculty facultyCreate = new Faculty();
+        facultyCreate.setName(facultyEntity.getName());
+        facultyCreate.setColor(facultyEntity.getColor());
+        if (facultyEntity.getStudents() != null) {
+            facultyCreate.setStudents(facultyEntity.getStudents());
+        }
         return recordMapper.toRecord(
-                facultyRepository.save(
-                        recordMapper.toEntity(facultyRecord)));
+                facultyRepository.save(facultyCreate));
     }
 
     public FacultyRecord readFaculty(long id) {
