@@ -1,15 +1,23 @@
 package pro.sky.hwiii32.component;
 
 import org.springframework.stereotype.Component;
+import pro.sky.hwiii32.exceptions.FacultyNotFoundException;
 import pro.sky.hwiii32.model.Avatar;
 import pro.sky.hwiii32.model.Faculty;
 import pro.sky.hwiii32.model.Student;
 import pro.sky.hwiii32.record.AvatarRecord;
 import pro.sky.hwiii32.record.FacultyRecord;
 import pro.sky.hwiii32.record.StudentRecord;
+import pro.sky.hwiii32.repository.FacultyRepository;
 
 @Component
 public class RecordMapper {
+
+    private final FacultyRepository facultyRepository;
+
+    public RecordMapper(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
+    }
 
     public AvatarRecord toRecord(Avatar avatar) {
         AvatarRecord avatarRecord = new AvatarRecord();
@@ -49,6 +57,12 @@ public class RecordMapper {
         student.setId(studentRecord.getId());
         student.setName(studentRecord.getName());
         student.setAge(studentRecord.getAge());
+        if (studentRecord.getFacultyId() != null) {
+            Faculty faculty = facultyRepository.findById(
+                            studentRecord.getFacultyId())
+                    .orElseThrow(() -> new FacultyNotFoundException(String.valueOf(studentRecord.getFacultyId())));
+            student.setFaculty(faculty);
+        }
         return student;
     }
 
