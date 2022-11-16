@@ -10,7 +10,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.test.context.TestPropertySource;
 import pro.sky.hwiii32.component.RecordMapper;
 import pro.sky.hwiii32.model.Avatar;
 import pro.sky.hwiii32.model.Student;
@@ -27,7 +26,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("classpath:application-test.properties")
+//@TestPropertySource("classpath:src/test/resources/application.properties")
 class AvatarControllerTest {
 
     @LocalServerPort

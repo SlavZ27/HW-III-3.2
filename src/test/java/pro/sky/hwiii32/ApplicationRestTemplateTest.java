@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
 import pro.sky.hwiii32.component.RecordMapper;
 import pro.sky.hwiii32.controller.AvatarController;
 import pro.sky.hwiii32.controller.StudentController;
@@ -29,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("classpath:application-test.properties")
+//@TestPropertySource("classpath:resources/application.properties")
 class ApplicationRestTemplateTest {
 
     @LocalServerPort
@@ -56,6 +55,7 @@ class ApplicationRestTemplateTest {
         studentRepository.deleteAll();
         facultyRepository.deleteAll();
     }
+
     @BeforeEach
     public void generateData() {
         int need = 100;

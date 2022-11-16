@@ -16,6 +16,7 @@ import pro.sky.hwiii32.repository.FacultyRepository;
 import java.util.*;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -79,11 +80,34 @@ class FacultyServiceTest {
 
     @Test
     void createFacultyTest() {
-        when(recordMapper.toRecord(faculty)).thenReturn(facultyRecord);
-        when(recordMapper.toEntity(facultyRecord)).thenReturn(faculty);
-        when(facultyRepository.save(faculty)).thenReturn(faculty);
+        Faculty facultyId = new Faculty();
+        facultyId.setId(1L);
+        facultyId.setName("22222");
+        facultyId.setColor("blue");
 
-        assertEquals(facultyService.createFaculty(facultyRecord), facultyRecord);
+        FacultyRecord facultyRecordId = new FacultyRecord();
+        facultyRecordId.setId(1L);
+        facultyRecordId.setName("22222");
+        facultyRecordId.setColor("blue");
+
+        Faculty facultyNoId = new Faculty();
+        facultyNoId.setName("22222");
+        facultyNoId.setColor("blue");
+
+        FacultyRecord facultyRecordNoId = new FacultyRecord();
+        facultyRecordNoId.setName("22222");
+        facultyRecordNoId.setColor("blue");
+
+
+        when(recordMapper.toEntity(facultyRecordNoId)).thenReturn(facultyNoId);
+        when(recordMapper.toRecord(facultyId)).thenReturn(facultyRecordId);
+        when(facultyRepository.save(facultyNoId)).thenReturn(facultyId);
+
+        FacultyRecord frt = facultyService.createFaculty(facultyRecordNoId);
+
+        assertThat(frt)
+                .usingRecursiveComparison().ignoringFields("id")
+                .isEqualTo(facultyRecordId);
     }
 
     @Test

@@ -15,6 +15,7 @@ import pro.sky.hwiii32.repository.StudentRepository;
 
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -76,11 +77,37 @@ class StudentServiceTest {
 
     @Test
     void createStudentTest() {
-        when(recordMapper.toRecord(student)).thenReturn(studentRecord);
-        when(recordMapper.toEntity(studentRecord)).thenReturn(student);
-        when(studentRepository.save(student)).thenReturn(student);
+        Student studentId = new Student();
+        studentId.setId(2L);
+        studentId.setName("11111");
+        studentId.setAge(5);
+        studentId.setFaculty(faculty);
 
-        assertEquals(studentService.createStudent(studentRecord), studentRecord);
+        Student studentNotId = new Student();
+        studentNotId.setName("11111");
+        studentNotId.setAge(5);
+        studentNotId.setFaculty(faculty);
+
+        StudentRecord studentRecordId = new StudentRecord();
+        studentRecordId.setName("11111");
+        studentRecordId.setAge(5);
+        studentRecordId.setFacultyId(faculty.getId());
+
+        StudentRecord studentRecordNotId = new StudentRecord();
+        studentRecordNotId.setId(2L);
+        studentRecordNotId.setName("11111");
+        studentRecordNotId.setAge(5);
+        studentRecordNotId.setFacultyId(faculty.getId());
+
+        when(recordMapper.toEntity(studentRecordNotId)).thenReturn(studentNotId);
+        when(recordMapper.toRecord(studentId)).thenReturn(studentRecordId);
+        when(studentRepository.save(studentNotId)).thenReturn(studentId);
+
+        StudentRecord srt = studentService.createStudent(studentRecordNotId);
+
+        assertThat(srt)
+                .usingRecursiveComparison().ignoringFields("id")
+                .isEqualTo(studentRecordId);
     }
 
     @Test
@@ -153,14 +180,5 @@ class StudentServiceTest {
 
         assertEquals(studentService.getFacultyByStudent(2L)
                 , facultyRecord);
-    }
-
-    @Test
-    void findStudentsByFacultyTest() {
-        when(studentRepository.findStudentsByFacultyId(1L))
-                .thenReturn(new ArrayList<>(List.of(student)));
-
-        assertIterableEquals(studentService.findStudentsByFaculty(1L)
-                , new ArrayList<>(List.of(student)));
     }
 }

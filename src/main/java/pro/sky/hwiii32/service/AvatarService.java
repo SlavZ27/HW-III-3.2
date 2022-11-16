@@ -1,6 +1,8 @@
 package pro.sky.hwiii32.service;
 
 import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
@@ -30,6 +33,7 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
     private final RecordMapper recordMapper;
+    final Logger logger = LoggerFactory.getLogger(AvatarService.class);
     @Value("${path.to.avatars.folder}")
     private String avatarsDir;
 
@@ -41,14 +45,30 @@ public class AvatarService {
     }
 
     public Avatar findAvatarByStudentIdByIdOrNew(Long studentId) {
-        return avatarRepository
-                .findAvatarByStudent(
-                        studentRepository.findById(studentId).
-                                orElseThrow(() -> new StudentNotFoundException(String.valueOf(studentId))))
+        logger.info("Was invoked method findAvatarByStudentIdByIdOrNew " +
+                "for find avatar of student by id of student by id = {}", studentId);
+
+        Optional<Avatar> avatarOptional =
+                avatarRepository
+                        .findAvatarByStudent(
+                                studentRepository.findById(studentId).
+                                        orElseThrow(() -> new StudentNotFoundException(String.valueOf(studentId))));
+
+        logger.debug("A student with id = {} was found in method findAvatarByStudentIdByIdOrNew", studentId);
+        if (avatarOptional.isEmpty()) {
+            logger.debug("Avatar was not found in method findAvatarByStudentIdByIdOrNew " +
+                    "for the student with id = {}. Was create new.", studentId);
+        } else {
+            logger.debug("Avatar was found in method findAvatarByStudentIdByIdOrNew " +
+                    "for the student with id = {}", studentId);
+        }
+
+        return avatarOptional
                 .orElse(new Avatar());
     }
 
     public Avatar uploadAvatar(Long studentId, MultipartFile fileAvatar) throws IOException {
+        logger.info("Was invoked method uploadAvatar for upload avatar of student by id = {}", studentId);
         Student student = studentRepository
                 .findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException(String.valueOf(studentId)));
@@ -71,6 +91,7 @@ public class AvatarService {
                 BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
         ) {
             bis.transferTo(bos);
+            logger.info("In method uploadAvatar transfer was done");
         }
         Avatar avatar = findAvatarByStudentIdByIdOrNew(studentId);
         avatar.setFilePath(filePath.toString());
@@ -83,10 +104,13 @@ public class AvatarService {
 
 
     public AvatarRecord createAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
+        logger.info("Was invoked method createAvatar for create avatar of student by id = {}", studentId);
         return recordMapper.toRecord(uploadAvatar(studentId, avatarFile));
     }
 
     public void readAvatarFromDir(Long studentId, HttpServletResponse response) throws IOException {
+        logger.info("Was invoked method readAvatarFromDir " +
+                "for read avatar of student by id = {} from file system", studentId);
         Avatar avatar = readAvatarDb(studentId);
         Path path = Path.of(avatar.getFilePath());
         try (
@@ -101,6 +125,8 @@ public class AvatarService {
     }
 
     public Avatar readAvatarDb(long studentId) {
+        logger.info("Was invoked method readAvatarDb for read avatar of student by id = {} from data base", studentId);
+
         return avatarRepository
                 .findAvatarByStudent(
                         studentRepository.findById(studentId).
@@ -110,6 +136,7 @@ public class AvatarService {
     }
 
     public String deleteAvatar(long studentId) throws IOException {
+        logger.info("Was invoked method deleteAvatar for delete avatar of student by id = {}", studentId);
         Avatar deleteAvatar = avatarRepository
                 .findAvatarByStudent(
                         studentRepository.findById(studentId).
@@ -123,7 +150,9 @@ public class AvatarService {
     }
 
     public List<AvatarRecord> getAllAvatarWithPagination(Integer pageNumber, Integer pageSize) {
-        PageRequest pageRequest = PageRequest.of(pageNumber-1,pageSize);
+        logger.info("Was invoked method getAllAvatarWithPagination " +
+                "for send all avatar with pagination. pageNumber = {}, pageSize = {}", pageNumber, pageSize);
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         return avatarRepository.findAll(pageRequest).getContent().stream()
                 .map(recordMapper::toRecord)
                 .collect(Collectors.toList());
