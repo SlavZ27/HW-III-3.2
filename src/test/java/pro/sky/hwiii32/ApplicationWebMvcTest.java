@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import pro.sky.hwiii32.component.RecordMapper;
@@ -23,6 +25,7 @@ import pro.sky.hwiii32.service.AvatarService;
 import pro.sky.hwiii32.service.FacultyService;
 import pro.sky.hwiii32.service.StudentService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -440,6 +443,7 @@ class ApplicationWebMvcTest {
                 )
                 .andExpect(status().isNotFound());
     }
+
 /////////////////////////////////////////////////////////////////////////////////////
 
     @Test
@@ -839,5 +843,44 @@ class ApplicationWebMvcTest {
                 .andExpect(jsonPath("[?(@.id==2)].age").value(sAge2))
                 .andExpect(jsonPath("[?(@.id==3)].name").value(sName3))
                 .andExpect(jsonPath("[?(@.id==3)].age").value(sAge3));
+    }
+
+    @Test
+    public void getLongestNameFacultyTest() throws Exception {
+
+        Faculty faculty1 = new Faculty();
+        faculty1.setId(1L);
+        faculty1.setName("qwerty");
+        faculty1.setColor("blue");
+
+        Faculty faculty2 = new Faculty();
+        faculty2.setId(2L);
+        faculty2.setName("qwertyytrewq");
+        faculty2.setColor("blue");
+
+        Faculty faculty3 = new Faculty();
+        faculty3.setId(3L);
+        faculty3.setName("dfdsfgsdhga");
+        faculty3.setColor("blue");
+
+        List<Faculty> facultyList = new ArrayList<>(List.of(faculty1, faculty2, faculty3));
+
+        when(facultyRepository.findAll())
+                .thenReturn(facultyList);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty/longest-name")
+                        .accept(MediaType.TEXT_HTML)
+                )
+                .andExpect(result -> {
+                    MockHttpServletResponse mockHttpServletResponse = result.getResponse();
+                    assertThat(mockHttpServletResponse.getStatus())
+                            .isEqualTo(HttpStatus.OK.value());
+                    String str = mockHttpServletResponse.getContentAsString(StandardCharsets.UTF_8);
+                    assertThat(str)
+                            .isEqualTo("qwertyytrewq");
+                });
+
+
     }
 }

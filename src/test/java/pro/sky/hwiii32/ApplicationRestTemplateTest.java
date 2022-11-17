@@ -23,6 +23,7 @@ import pro.sky.hwiii32.repository.StudentRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -295,6 +296,50 @@ class ApplicationRestTemplateTest {
                         expectedListRecord.stream()
                                 .map(StudentRecord::getId)
                                 .collect(Collectors.toList())));
+    }
+
+    @Test
+    public void getStudentWithFirstCharOfNameTest() {
+        List<Student> studentList = studentRepository.findAll();
+
+        List<String> studentNameList = new ArrayList<>();
+        for (Student student : studentList) {
+            studentNameList.add(capitalize(student.getName().toLowerCase()));
+        }
+
+        List<String> actualStudentRecord = new ArrayList<>();
+        for (String s : studentNameList) {
+            if (s.startsWith("A")) {
+                actualStudentRecord.add(s);
+            }
+        }
+
+        String[] requestStudentRecord = restTemplate
+                .getForObject("http://localhost:" + port + "/student/names/a",
+                        String[].class);
+        List<String> expectedStudentRecord = new ArrayList<>(List.of(requestStudentRecord));
+
+        assertThat(actualStudentRecord)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedStudentRecord);
+    }
+
+    @Test
+    public void getMidAgeOfAllStudentsTest() {
+        List<Student> studentList = studentRepository.findAll();
+
+        int ageSum = 0;
+        for (Student student : studentList) {
+            ageSum = ageSum + student.getAge();
+        }
+        Double actualAvg = (double) ageSum / studentList.size();
+
+        Double expectedAvg = restTemplate
+                .getForObject("http://localhost:" + port + "/student/mid-age-stream",
+                        Double.class);
+
+        assertThat(actualAvg)
+                .isEqualTo(expectedAvg);
     }
 
     private Student generateStudent(Faculty faculty) {

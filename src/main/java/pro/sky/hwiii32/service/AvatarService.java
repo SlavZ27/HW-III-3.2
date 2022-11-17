@@ -33,7 +33,7 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
     private final RecordMapper recordMapper;
-    final Logger logger = LoggerFactory.getLogger(AvatarService.class);
+    private final static Logger logger = LoggerFactory.getLogger(AvatarService.class);
     @Value("${path.to.avatars.folder}")
     private String avatarsDir;
 

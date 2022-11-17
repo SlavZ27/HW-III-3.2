@@ -18,7 +18,7 @@ public class FacultyService {
 
     private final FacultyRepository facultyRepository;
     private final RecordMapper recordMapper;
-    final Logger logger = LoggerFactory.getLogger(FacultyService.class);
+    private final static Logger logger = LoggerFactory.getLogger(FacultyService.class);
 
 
     public FacultyService(FacultyRepository facultyRepository, RecordMapper recordMapper) {
@@ -103,4 +103,14 @@ public class FacultyService {
                 .map(recordMapper::toRecord)
                 .collect(Collectors.toList());
     }
+
+    public String getLongestNameFaculty() {
+        logger.info("Was invoked method getLongestNameFaculty " +
+                "for send longest name of faculty");
+        return facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparing(String::length))
+                .orElse(null);
+    }
+
 }

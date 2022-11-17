@@ -21,5 +21,9 @@ public class InfoController {
         return ResponseEntity.ok(infoService.getPort());
     }
 
-
+    //GET http://localhost:8080/getPort
+    @GetMapping("getIntValue")
+    public ResponseEntity<Integer> getIntValue() {
+        return ResponseEntity.ok(infoService.getIntValue());
+    }
 }

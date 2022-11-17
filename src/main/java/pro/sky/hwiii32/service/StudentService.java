@@ -1,5 +1,6 @@
 package pro.sky.hwiii32.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final RecordMapper recordMapper;
-    final Logger logger = LoggerFactory.getLogger(StudentService.class);
+    private final static Logger logger = LoggerFactory.getLogger(StudentService.class);
 
 
     public StudentService(StudentRepository studentRepository, RecordMapper recordMapper) {
@@ -120,5 +121,26 @@ public class StudentService {
         return studentRepository.get5StudentWithBiggerId().stream()
                 .map(recordMapper::toRecord)
                 .collect(Collectors.toList());
+    }
+
+    public List<String> getStudentWithFirstCharOfName(Character firstChar) {
+        logger.info("Was invoked method getStudentWithFirstCharOfName " +
+                "for send list of students with first char = {}", firstChar);
+
+        return studentRepository.findAll().stream()
+                .parallel()
+                .map(Student::getName)
+                .filter(name -> name.substring(0, 1).equalsIgnoreCase(String.valueOf(firstChar)))
+                .map(s -> StringUtils.capitalize(s.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public Double getMidAgeOfAllStudents() {
+        logger.info("Was invoked method getMidAgeOfAllStudents " +
+                "for send average age of students");
+        return studentRepository.findAll().stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0);
     }
 }

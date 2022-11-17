@@ -82,4 +82,15 @@ public class StudentController {
         return ResponseEntity.ok(studentService.get5StudentWithBiggerId());
     }
 
+    @GetMapping("names/{first-char}")  //GET http://localhost:8080/student/names/a
+    public ResponseEntity<List<String>> getStudentWithFirstCharOfName(@PathVariable(value = "first-char") Character firstChar) {
+        return ResponseEntity.ok(studentService.getStudentWithFirstCharOfName(firstChar));
+    }
+
+
+    @GetMapping("mid-age-stream")  //GET http://localhost:8080/student/mid-age-stream
+    public ResponseEntity<Double> getMidAgeOfAllStudents() {
+        return ResponseEntity.ok(studentService.getMidAgeOfAllStudents());
+    }
+
 }
