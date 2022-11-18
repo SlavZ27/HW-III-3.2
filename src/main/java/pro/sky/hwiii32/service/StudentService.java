@@ -24,6 +24,8 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final RecordMapper recordMapper;
     private final static Logger logger = LoggerFactory.getLogger(StudentService.class);
+    private final Object flag = new Object();
+    private int count;
 
 
     public StudentService(StudentRepository studentRepository, RecordMapper recordMapper) {
@@ -140,6 +142,58 @@ public class StudentService {
         return studentRepository.findAll().stream()
                 .mapToInt(Student::getAge)
                 .average()
-                .orElseThrow(()->new NotFoundException("Список пуст"));
+                .orElseThrow(() -> new NotFoundException("List is empty"));
     }
+
+    public void sout() {
+        logger.info("Was invoked method sout " +
+                "for print names of students to console in different threads");
+        List<Student> studentList = studentRepository.findAll();
+        count = 0;
+        printName(studentList, 0);
+        new Thread(() -> {
+            printName(studentList, 1);
+            printName(studentList, 2);
+        }).start();
+        new Thread(() -> {
+            printName(studentList, 3);
+            printName(studentList, 4);
+        }).start();
+        printName(studentList, 5);
+    }
+
+    public void sout2() {
+        logger.info("Was invoked method sout2 " +
+                "for print names of students to console in different and synchronized threads");
+        List<Student> studentList = studentRepository.findAll();
+        count = 0;
+        printName2(studentList);
+        printName2(studentList);
+        new Thread(() -> {
+            printName2(studentList);
+            printName2(studentList);
+        }).start();
+        new Thread(() -> {
+            printName2(studentList);
+            printName2(studentList);
+        }).start();
+    }
+
+    private void printName2(List<Student> studentList) {
+        if (studentList.size() - 1 < count) {
+            throw new StudentNotFoundException(String.valueOf(count));
+        }
+        synchronized (flag) {
+            System.out.println("studentList.get(" + count + ") = " + studentList.get(count).getName());
+            count++;
+        }
+    }
+
+    private void printName(List<Student> studentList, int id) {
+        if (studentList.size() - 1 < id) {
+            throw new StudentNotFoundException(String.valueOf(id));
+        }
+        System.out.println("studentList.get(" + id + ") = " + studentList.get(id).getName());
+    }
+
 }

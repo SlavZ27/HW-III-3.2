@@ -111,7 +111,7 @@ public class FacultyService {
         return facultyRepository.findAll().stream()
                 .map(Faculty::getName)
                 .max(Comparator.comparing(String::length))
-                .orElseThrow(() -> new NotFoundException("Список пуст"));
+                .orElseThrow(() -> new NotFoundException("List is empty"));
     }
 
 }
