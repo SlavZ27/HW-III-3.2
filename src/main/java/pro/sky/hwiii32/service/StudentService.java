@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import pro.sky.hwiii32.component.RecordMapper;
 import pro.sky.hwiii32.exceptions.FacultyNotFoundException;
 import pro.sky.hwiii32.exceptions.StudentNotFoundException;
@@ -126,9 +127,7 @@ public class StudentService {
     public List<String> getStudentWithFirstCharOfName(Character firstChar) {
         logger.info("Was invoked method getStudentWithFirstCharOfName " +
                 "for send list of students with first char = {}", firstChar);
-
         return studentRepository.findAll().stream()
-                .parallel()
                 .map(Student::getName)
                 .filter(name -> name.substring(0, 1).equalsIgnoreCase(String.valueOf(firstChar)))
                 .map(s -> StringUtils.capitalize(s.toLowerCase()))
@@ -141,6 +140,6 @@ public class StudentService {
         return studentRepository.findAll().stream()
                 .mapToInt(Student::getAge)
                 .average()
-                .orElse(0);
+                .orElseThrow(()->new NotFoundException("Список пуст"));
     }
 }

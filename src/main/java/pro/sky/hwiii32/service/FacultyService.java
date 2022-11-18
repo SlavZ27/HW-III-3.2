@@ -3,6 +3,7 @@ package pro.sky.hwiii32.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import pro.sky.hwiii32.component.RecordMapper;
 import pro.sky.hwiii32.exceptions.FacultyNotFoundException;
 import pro.sky.hwiii32.model.Faculty;
@@ -110,7 +111,7 @@ public class FacultyService {
         return facultyRepository.findAll().stream()
                 .map(Faculty::getName)
                 .max(Comparator.comparing(String::length))
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("Список пуст"));
     }
 
 }
