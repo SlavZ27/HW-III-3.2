@@ -1,45 +1,145 @@
 package pro.sky.hwiii32.service;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
+import pro.sky.hwiii32.component.RecordMapper;
+import pro.sky.hwiii32.exceptions.FacultyNotFoundException;
+import pro.sky.hwiii32.exceptions.StudentNotFoundException;
 import pro.sky.hwiii32.model.Student;
+import pro.sky.hwiii32.record.FacultyRecord;
+import pro.sky.hwiii32.record.StudentRecord;
 import pro.sky.hwiii32.repository.StudentRepository;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final RecordMapper recordMapper;
+    private final static Logger logger = LoggerFactory.getLogger(StudentService.class);
 
-    public StudentService(StudentRepository studentRepository) {
+
+    public StudentService(StudentRepository studentRepository, RecordMapper recordMapper) {
         this.studentRepository = studentRepository;
+        this.recordMapper = recordMapper;
     }
 
-    public Student createStudent(Student student) {
-        return studentRepository.save(student);
+    public Student findStudentById(Long id) {
+        logger.info("Was invoked method findStudentById for find student by id");
+
+        Optional<Student> studentOptional = studentRepository.findById(id);
+
+        if (studentOptional.isPresent()) {
+            logger.debug("Student with id = {} was found", id);
+        }
+
+        return studentOptional.orElseThrow(() -> new StudentNotFoundException(String.valueOf(id)));
     }
 
-    public Student findStudent(long id) {
-        return studentRepository.findById(id).orElse(null);
+    public StudentRecord createStudent(StudentRecord studentRecord) {
+        logger.info("Was invoked method createStudent for create student");
+        Student studentEntity = recordMapper.toEntity(studentRecord);
+        Student studentCreate = new Student();
+
+        studentCreate.setName(studentEntity.getName());
+        studentCreate.setAge(studentEntity.getAge());
+        if (studentEntity.getFaculty() != null) {
+            studentCreate.setFaculty(studentEntity.getFaculty());
+        }
+        return recordMapper.toRecord(
+                studentRepository.save(studentCreate));
     }
 
-    public Student editStudent(Student student) {
-        return studentRepository.save(student);
+    public StudentRecord readStudent(long id) {
+        logger.info("Was invoked method readStudent for read student by id = {}", id);
+        return recordMapper.toRecord(findStudentById(id));
     }
 
-    public void deleteStudent(long id) {
+    public StudentRecord updateStudent(StudentRecord studentRecord) {
+        logger.info("Was invoked method updateStudent for update student");
+        Student updateStudent = findStudentById(studentRecord.getId());
+        updateStudent.setName(studentRecord.getName());
+        updateStudent.setAge(studentRecord.getAge());
+        return recordMapper.toRecord(studentRepository.save(updateStudent));
+    }
+
+    public StudentRecord deleteStudent(long id) {
+        logger.info("Was invoked method deleteStudent for delete student by id = {}", id);
+        Student deleteStudent = findStudentById(id);
         studentRepository.deleteById(id);
+        return recordMapper.toRecord(deleteStudent);
     }
 
-    public Collection<Student> getAll() {
-        return studentRepository.findAll();
+    public Collection<StudentRecord> getAll() {
+        logger.info("Was invoked method getAll for send all students");
+        return studentRepository.findAll().stream()
+                .map(recordMapper::toRecord)
+                .collect(Collectors.toList());
     }
 
-    public Collection<Student> getStudentsWithEqualAge(int age) {
-//        return studentRepository.findAll().stream()
-//                .filter(student -> student.getAge() == age)
-//                .collect(Collectors.toList());
-        return studentRepository.findStudentsByAge(age);
+    public Collection<StudentRecord> getStudentsWithEqualAge(int age) {
+        logger.info("Was invoked method getStudentsWithEqualAge " +
+                "for send all students with the required age = {}", age);
+        return studentRepository.findStudentsByAge(age).stream()
+                .map(recordMapper::toRecord)
+                .collect(Collectors.toList());
     }
 
+    public Collection<StudentRecord> getStudentsWithBetweenAge(Integer ageFrom, Integer ageTo) {
+        logger.info("Was invoked method getStudentsWithEqualAge " +
+                "for send all students with ages from = {} and to = {}", ageFrom, ageTo);
+        return studentRepository.findStudentsByAgeBetween(ageFrom, ageTo).stream()
+                .map(recordMapper::toRecord)
+                .collect(Collectors.toList());
+    }
+
+    public FacultyRecord getFacultyByStudent(Long studentId) {
+        logger.info("Was invoked method getFacultyByStudent " +
+                "for send faculty of students with id = {}", studentId);
+        return recordMapper.toRecord(Optional.ofNullable(
+                findStudentById(studentId).getFaculty()).orElseThrow(() -> new FacultyNotFoundException("")));
+    }
+
+    public Long getCountStudent() {
+        logger.info("Was invoked method getCountStudent for send the amount of students");
+        return studentRepository.getCountStudent();
+    }
+
+    public Float getMidAgeOfStudent() {
+        logger.info("Was invoked method getMidAgeOfStudent for send the middle age of students");
+        return studentRepository.getMidAgeOfStudent();
+    }
+
+    public List<StudentRecord> get5StudentWithBiggerId() {
+        logger.info("Was invoked method get5StudentWithBiggerId for send five students with bigger id");
+        return studentRepository.get5StudentWithBiggerId().stream()
+                .map(recordMapper::toRecord)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getStudentWithFirstCharOfName(Character firstChar) {
+        logger.info("Was invoked method getStudentWithFirstCharOfName " +
+                "for send list of students with first char = {}", firstChar);
+        return studentRepository.findAll().stream()
+                .map(Student::getName)
+                .filter(name -> name.substring(0, 1).equalsIgnoreCase(String.valueOf(firstChar)))
+                .map(s -> StringUtils.capitalize(s.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public Double getMidAgeOfAllStudents() {
+        logger.info("Was invoked method getMidAgeOfAllStudents " +
+                "for send average age of students");
+        return studentRepository.findAll().stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElseThrow(()->new NotFoundException("Список пуст"));
+    }
 }

@@ -1,9 +1,10 @@
 package pro.sky.hwiii32.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+
+import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Faculty {
@@ -12,6 +13,8 @@ public class Faculty {
     private long id;
     private String name;
     private String color;
+    @OneToMany(mappedBy = "faculty")
+    private Set<Student> students;
 
     @Override
     public String toString() {
@@ -57,5 +60,13 @@ public class Faculty {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Set<Student> getStudents() {
+        return new HashSet<>(students);
+    }
+
+    public void setStudents(Set<Student> students) {
+        this.students = students;
     }
 }
