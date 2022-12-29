@@ -87,10 +87,21 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getStudentWithFirstCharOfName(firstChar));
     }
 
-
     @GetMapping("mid-age-stream")  //GET http://localhost:8080/student/mid-age-stream
     public ResponseEntity<Double> getMidAgeOfAllStudents() {
         return ResponseEntity.ok(studentService.getMidAgeOfAllStudents());
+    }
+
+    @GetMapping("sout")  //GET http://localhost:8080/student/sout
+    public HttpStatus sout() {
+        studentService.sout();
+        return HttpStatus.OK;
+    }
+
+    @GetMapping("sout2")  //GET http://localhost:8080/student/sout2
+    public HttpStatus sout2() {
+        studentService.sout2();
+        return HttpStatus.OK;
     }
 
 }
